@@ -1,13 +1,9 @@
 import socket
+import requests
 
-sock = socket.socket()
-sock.connect(('localhost', 9090))
-msg = b'hello, server'
-sock.send(msg)
-
-data = sock.recv(1024)
-sock.close()
-
-
-print("sended: ", msg)
-print("recived: ", data)
+r = requests.get('http://localhost:9090', auth=('admin', 'admin'))
+print(r.status_code)
+print(r.headers['content-type'])
+print(r.encoding)
+print(r.text)
+print(r.json())
