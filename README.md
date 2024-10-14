@@ -2,44 +2,33 @@
 
 ### Сервер
 ```Python
-import socket
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-sock = socket.socket()
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        # Устанавливаем код ответа
+        self.send_response(200)
+        
+        # Добавляем заголовки (например, тип контента)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
 
-sock.bind(('', 9090))
+        # Отправляем тело ответа
+        response_content = '{"message": "Hello from server!"}'
+        self.wfile.write(response_content.encode('utf-8'))
 
-sock.listen(3)
+def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler):
+    server_address = ('', 9090)  # IP и порт для сервера
+    httpd = server_class(server_address, handler_class)
+    # print("Starting server on port 9090...")
+    httpd.serve_forever()
 
-while True:
-    conn, addr = sock.accept()
-    print("connected ", addr)
-    data = conn.recv(1024)
-    conn.send(b'hello, client!')
-    conn.close()
-```
-
-### Клиент
-```Python
-import socket
-
-sock = socket.socket()
-sock.connect(('localhost', 9090))
-msg = b'hello, server'
-sock.send(msg)
-
-data = sock.recv(1024)
-sock.close()
-
-
-print("sended: ", msg)
-print("recived: ", data)
-```
-
-### Запуск
-```
-docker-compose up -d
-```
+if __name__ == "__main__":
+    run()
 
 ```
-python tcp_client/client.py
+
+## Тестовый запрос
+```
+curl -X GET http://localhost:9090/
 ```
